@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = "A minifier of Ruby files."
   spec.homepage      = "http://github.com/koic/minifyrb"
   spec.license       = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 3.3.0")
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "http://github.com/koic/minifyrb"
