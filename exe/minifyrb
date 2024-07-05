@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift("#{__dir__}/../lib")
+
+require 'optparse'
+require 'minifyrb'
+
+params = {}
+
+OptionParser.new do |opt|
+  opt.banner = 'Usage: minifyrb [options] [file1, file2, ...]'
+
+  opt.on('-v', '--version', 'Output the version number.') do
+    params[:version] = true
+  end
+
+  opt.on('-o', '--output <file>', 'Output file (default STDOUT).') do |filepath|
+    params[:output] = filepath
+  end
+
+  opt.parse!
+rescue OptionParser::InvalidOption, OptionParser::MissingArgument
+  puts opt.help
+  exit 1
+end
+
+if params[:version]
+  puts Minifyrb::VERSION
+  exit
+end
+
+filepaths = ARGV
+sources = []
+
+if filepaths.empty?
+  sources = [$stdin.read]
+else
+  filepaths.map do |filepath|
+    sources << File.read(filepath)
+  end
+end
+
+minified_rubies = sources.map { |source| Minifyrb::Minifier.new(source).minify }.join
+
+if (filepath = params[:output])
+  File.write(filepath, minified_rubies)
+else
+  puts minified_rubies
+end
