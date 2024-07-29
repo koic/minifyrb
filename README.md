@@ -1,8 +1,8 @@
-# Minifyrb
+# Minify Ruby
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/minifyrb`. To experiment with that code, run `bin/console` for an interactive prompt.
+[![CI](https://github.com/koic/minifyrb/actions/workflows/test.yml/badge.svg)](https://github.com/koic/minifyrb/actions/workflows/test.yml)
 
-TODO: Delete this and the text above, and describe your gem
+A minifier of Ruby files.
 
 ## Installation
 
@@ -14,15 +14,57 @@ gem 'minifyrb'
 
 And then execute:
 
-    $ bundle install
+```console
+$ bundle install
+```
 
 Or install it yourself as:
 
-    $ gem install minifyrb
+```console
+$ gem install minifyrb
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+For execution from the command line, use `minifyrb` command:
+
+```console
+$ cat path/to/example.rb
+def foo
+  bar(arg, **options) do
+    baz.qux
+  end
+end
+
+$ minifyrb path/to/example.rb
+def foo
+bar(arg,**options) do baz.qux
+end
+end
+```
+
+You can check the command line options with `-h` or `--help`:
+
+```console
+$ minifyrb -h
+Usage: minifyrb [options] [file1, file2, ...]
+    -v, --version                    Output the version number.
+    -o, --output <file>              Output file (default STDOUT).
+```
+
+From Ruby code, use `Minifyrb::Minifier#minify` API:
+
+```ruby
+require 'minifyrb'
+
+source = <<~'RUBY'
+  def say(name)
+    puts "Hello, #{name}!"
+  end
+RUBY
+
+Minifyrb::Minifier.new(source).minify # => "def say(name)puts\"Hello, \#{name}!\"\nend\n"
+```
 
 ## Development
 
