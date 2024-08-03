@@ -20,6 +20,8 @@ module Minifyrb
     )
 
     def initialize(source)
+      raise SyntaxError unless Prism.parse_success?(source)
+
       @source = source
     end
 

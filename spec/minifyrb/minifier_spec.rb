@@ -4,6 +4,18 @@ RSpec.describe Minifyrb::Minifier do
   describe '#minify' do
     subject(:minified_ruby) { described_class.new(source).minify }
 
+    context 'when using an incorrect syntax' do
+      let(:source) do
+        <<~RUBY
+          foo('arg
+        RUBY
+      end
+
+      it 'raises syntax error' do
+        expect { minified_ruby }.to raise_error(SyntaxError)
+      end
+    end
+
     context 'when using single-line comments' do
       let(:source) do
         <<~RUBY
@@ -565,13 +577,13 @@ RSpec.describe Minifyrb::Minifier do
     context 'when using `yield`' do
       let(:source) do
         <<~RUBY
-          foo do yield bar end
+          def x() = foo do yield bar end
         RUBY
       end
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          foo do yield bar end
+          def x()=foo do yield bar end
         RUBY
       end
     end
@@ -623,8 +635,8 @@ RSpec.describe Minifyrb::Minifier do
         <<~RUBY
           begin
           rescue CustomError => e
-          ensure
           else
+          ensure
           end
         RUBY
       end
@@ -632,7 +644,7 @@ RSpec.describe Minifyrb::Minifier do
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
           begin rescue CustomError=>e
-          ensure else end
+          else ensure end
         RUBY
       end
     end
@@ -787,22 +799,6 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
-    context 'when defining one-liner class with variable' do
-      let(:source) do
-        <<~RUBY
-          var = Foo
-          class var end
-        RUBY
-      end
-
-      it 'contains spaces for one-liner class definition' do
-        expect(minified_ruby).to eq <<~RUBY
-          var=Foo
-          class var end
-        RUBY
-      end
-    end
-
     context 'when defining module' do
       let(:source) do
         <<~RUBY
@@ -829,22 +825,6 @@ RSpec.describe Minifyrb::Minifier do
       it 'contains spaces' do
         expect(minified_ruby).to eq <<~RUBY
           module Foo end
-        RUBY
-      end
-    end
-
-    context 'when defining one-liner module with variable' do
-      let(:source) do
-        <<~RUBY
-          var = Foo
-          module var end
-        RUBY
-      end
-
-      it 'contains spaces for one-liner module definition' do
-        expect(minified_ruby).to eq <<~RUBY
-          var=Foo
-          module var end
         RUBY
       end
     end
