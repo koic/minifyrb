@@ -588,6 +588,23 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using `yield` with arguments' do
+      let(:source) do
+        <<~RUBY
+          def x() = foo do
+            yield(x, y)
+          end
+        RUBY
+      end
+
+      it 'contain a space after the keyword' do
+        expect(minified_ruby).to eq <<~RUBY
+          def x()=foo do yield(x,y)
+          end
+        RUBY
+      end
+    end
+
     context 'when using `break`' do
       let(:source) do
         <<~RUBY

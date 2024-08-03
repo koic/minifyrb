@@ -100,6 +100,7 @@ module Minifyrb
 
     def padding_required?(token, next_token)
       return true if token.type == :IDENTIFIER && (next_token.type == :IDENTIFIER || next_token.type == :CONSTANT)
+      return false if next_token.type == :PARENTHESIS_LEFT
 
       AFTER_SPACE_REQUIRED_KEYWORDS.include?(token.type) || BEFORE_SPACE_REQUIRED_KEYWORDS.include?(next_token.type)
     end
