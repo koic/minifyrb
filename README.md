@@ -37,10 +37,7 @@ def foo
 end
 
 $ minifyrb path/to/example.rb
-def foo
-bar(arg,**options) do baz.qux
-end
-end
+def foo;bar(arg,**options) do baz.qux;end;end
 ```
 
 You can check the command line options with `-h` or `--help`:
@@ -63,7 +60,7 @@ source = <<~'RUBY'
   end
 RUBY
 
-Minifyrb::Minifier.new(source).minify # => "def say(name)puts\"Hello, \#{name}!\"\nend\n"
+Minifyrb::Minifier.new(source).minify # => "def say(name)puts\"Hello, \#{name}!\";end\n"
 ```
 
 ## Development

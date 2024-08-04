@@ -75,8 +75,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'does not contain a blank line' do
         expect(minified_ruby).to eq <<~RUBY
-          foo
-          bar
+          foo;bar
         RUBY
       end
     end
@@ -105,8 +104,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after method call' do
         expect(minified_ruby).to eq <<~RUBY
-          val='str'
-          foo val
+          val='str';foo val
         RUBY
       end
     end
@@ -165,8 +163,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after method call' do
         expect(minified_ruby).to eq <<~RUBY
-          val='str'
-          foo(val)
+          val='str';foo(val)
         RUBY
       end
     end
@@ -195,8 +192,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          if cond
-          end
+          if cond;end
         RUBY
       end
     end
@@ -211,8 +207,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space around the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          if cond then foo
-          end
+          if cond then foo;end
         RUBY
       end
     end
@@ -242,9 +237,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          if cond
-          elsif cond2
-          end
+          if cond;elsif cond2;end
         RUBY
       end
     end
@@ -259,8 +252,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          unless cond
-          end
+          unless cond;end
         RUBY
       end
     end
@@ -304,9 +296,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          case var
-          when cond
-          end
+          case var;when cond;end
         RUBY
       end
     end
@@ -323,9 +313,7 @@ RSpec.describe Minifyrb::Minifier do
       # TODO: Remove the redundant space before `in` keyword.
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          case var
-           in cond
-          end
+          case var; in cond;end
         RUBY
       end
     end
@@ -340,8 +328,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          while cond
-          end
+          while cond;end
         RUBY
       end
     end
@@ -356,8 +343,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          until cond
-          end
+          until cond;end
         RUBY
       end
     end
@@ -400,8 +386,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          for item in items
-          end
+          for item in items;end
         RUBY
       end
     end
@@ -599,8 +584,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          def x()=foo do yield(x,y)
-          end
+          def x()=foo do yield(x,y);end
         RUBY
       end
     end
@@ -660,8 +644,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
-          begin rescue CustomError=>e
-          else ensure end
+          begin rescue CustomError=>e;else ensure end
         RUBY
       end
     end
@@ -733,9 +716,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contains spaces' do
         expect(minified_ruby).to eq <<~RUBY
-          def foo arg
-          super arg
-          end
+          def foo arg;super arg;end
         RUBY
       end
     end
@@ -750,8 +731,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contains spaces' do
         expect(minified_ruby).to eq <<~RUBY
-          def foo
-          end
+          def foo;end
         RUBY
       end
     end
@@ -766,8 +746,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contains spaces' do
         expect(minified_ruby).to eq <<~RUBY
-          def self.foo
-          end
+          def self.foo;end
         RUBY
       end
     end
@@ -782,8 +761,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contains spaces' do
         expect(minified_ruby).to eq <<~RUBY
-          class Foo
-          end
+          class Foo;end
         RUBY
       end
     end
@@ -826,8 +804,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contains spaces' do
         expect(minified_ruby).to eq <<~RUBY
-          module Foo
-          end
+          module Foo;end
         RUBY
       end
     end
