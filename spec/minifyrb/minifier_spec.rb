@@ -185,6 +185,34 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when comparing with a non-predicate method is the LHS' do
+      let(:source) do
+        <<~RUBY
+          foo == !bar
+        RUBY
+      end
+
+      it 'contain a space between key and value' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo==!bar
+        RUBY
+      end
+    end
+
+    context 'when comparing with a predicate method is the LHS' do
+      let(:source) do
+        <<~RUBY
+          foo? == !bar
+        RUBY
+      end
+
+      it 'contain a space between key and value' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo? ==!bar
+        RUBY
+      end
+    end
+
     context 'when calling nexted methods without method call parenthesis' do
       let(:source) do
         <<~RUBY
@@ -1138,9 +1166,9 @@ RSpec.describe Minifyrb::Minifier do
         RUBY
       end
 
-      it 'contains spaces' do
+      it 'leaves space before equal operator' do
         expect(minified_ruby).to eq <<~RUBY
-          alias == eql?
+          alias ==eql?
         RUBY
       end
     end
