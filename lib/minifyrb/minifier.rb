@@ -82,6 +82,9 @@ module Minifyrb
 
           heredoc_content_tokens.clear
           in_heredoc = false
+        when :COLON
+          # NOTE: Prevent syntax errors by converting `cond(arg) ? x : y` to `cond(arg)?x:y`.
+          minified_values << "#{token.value} "
         when :NEWLINE
           minified_values << if next_token.type == :EOF
             token.value

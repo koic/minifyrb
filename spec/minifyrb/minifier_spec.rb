@@ -334,6 +334,21 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using ternary oprator' do
+      let(:source) do
+        <<~RUBY
+          cond(arg) ? x : y
+        RUBY
+      end
+
+      # NOTE: Prevent syntax error of `cond(arg)?x:y`.
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          cond(arg)?x: y
+        RUBY
+      end
+    end
+
     context 'when using `while` expression' do
       let(:source) do
         <<~RUBY
