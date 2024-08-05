@@ -1324,6 +1324,112 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using heredoc `<<HEREDOC` with interpolation' do
+      let(:source) do
+        <<~'RUBY'
+          <<HEREDOC
+            string #{interpolation} # comment
+            text # comment
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~'RUBY'
+          "  string #{interpolation} # comment
+            text # comment
+          "
+        RUBY
+      end
+    end
+
+    context 'when using heredoc `<<~HEREDOC` with interpolation' do
+      let(:source) do
+        <<~'RUBY'
+          <<~HEREDOC
+            string #{interpolation} # comment
+            text # comment
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~'RUBY'
+          "string #{interpolation} # comment
+          text # comment
+          "
+        RUBY
+      end
+    end
+
+    context 'when squiggly heredoc `<<-HEREDOC` has single quoted string' do
+      let(:source) do
+        <<~RUBY
+          <<-'HEREDOC'
+            'foo'
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~'RUBY'
+          '  \'foo\'
+          '
+        RUBY
+      end
+    end
+
+    context 'when squiggly heredoc `<<-HEREDOC` has double quoted string' do
+      let(:source) do
+        <<~RUBY
+          <<-HEREDOC
+            "foo"
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~'RUBY'
+          "  \"foo\"
+          "
+        RUBY
+      end
+    end
+
+    context 'when squiggly heredoc `<<~HEREDOC` has single quoted string' do
+      let(:source) do
+        <<~RUBY
+          <<~'HEREDOC'
+            'foo'
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~'RUBY'
+          '\'foo\'
+          '
+        RUBY
+      end
+    end
+
+    context 'when squiggly heredoc `<<~HEREDOC` has double quoted string' do
+      let(:source) do
+        <<~RUBY
+          <<~HEREDOC
+            "foo"
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~'RUBY'
+          "\"foo\"
+          "
+        RUBY
+      end
+    end
+
     context 'when using squiggly single-line heredoc `<<~HEREDOC`' do
       let(:source) do
         <<~RUBY

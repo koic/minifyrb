@@ -39,10 +39,14 @@ module Minifyrb
             minified_values << "\n"
           end
         when :IDENTIFIER
-          minified_values << token.value
+          if in_heredoc
+            heredoc_content_tokens << token
+          else
+            minified_values << token.value
 
-          if REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES.include?(next_token.type)
-            minified_values << ' '
+            if REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES.include?(next_token.type)
+              minified_values << ' '
+            end
           end
         when :IGNORED_NEWLINE, :EMBDOC_BEGIN, :EMBDOC_LINE, :EMBDOC_END
           # noop
@@ -63,25 +67,25 @@ module Minifyrb
           end
 
           minified_values << string_quote
-        when :STRING_CONTENT
-          if in_heredoc
-            heredoc_content_tokens << token
-          else
-            minified_values << token.value
-          end
         when :HEREDOC_END
-          heredoc_contents = if squiggly_heredoc
-            minimum_indentation_length = heredoc_content_tokens.map { |token|
-              token.value.match(/\A(?<indentation_spaces> *)/)[:indentation_spaces].length
+          heredoc_contents = heredoc_content_tokens.map { |token|
+            if token.type == :STRING_CONTENT
+              token.value.gsub(string_quote, "\\\\#{string_quote}") # Escape quotes.
+            else
+              token.value
+            end
+          }
+
+          if squiggly_heredoc
+            lines = heredoc_contents.join.lines
+
+            minimum_indentation_length = lines.map { |line|
+              line.match(/\A(?<indentation_spaces> *)/)[:indentation_spaces].length
             }.min
 
             indentation = ' ' * minimum_indentation_length
 
-            heredoc_content_tokens.map { |token|
-              token.value.delete_prefix!(indentation)
-            }
-          else
-            heredoc_content_tokens.map(&:value)
+            heredoc_contents = lines.map { |line| line.delete_prefix(indentation) }
           end
 
           minified_values << heredoc_contents << string_quote
@@ -120,7 +124,11 @@ module Minifyrb
             ';'
           end
         else
-          minified_values << token.value
+          if in_heredoc
+            heredoc_content_tokens << token
+          else
+            minified_values << token.value
+          end
         end
 
         if padding_required?(token, next_token)
