@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'prism'
+
+unless (source = ARGV[0])
+  warn 'usage: bin/lex source'
+  exit(1)
+end
+
+p Prism.lex(source).value.map(&:first).map(&:type)
