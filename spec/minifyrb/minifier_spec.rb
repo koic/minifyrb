@@ -155,6 +155,20 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when calling method with keyword argument with symbol value' do
+      let(:source) do
+        <<~RUBY
+          foo key: :value
+        RUBY
+      end
+
+      it 'contain a space between key and value' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo key: :value
+        RUBY
+      end
+    end
+
     context 'when calling nexted methods without method call parenthesis' do
       let(:source) do
         <<~RUBY

@@ -99,6 +99,12 @@ module Minifyrb
         when :COLON
           # NOTE: Prevent syntax errors by converting `cond(arg) ? x : y` to `cond(arg)?x:y`.
           minified_values << "#{token.value} "
+        when :LABEL
+          minified_values << ' ' if prev_token.type == :IDENTIFIER
+
+          minified_values << token.value
+
+          minified_values << ' ' if next_token.type == :SYMBOL_BEGIN
         when :KEYWORD_DEF
           minified_values << ' ' if prev_token&.type == :IDENTIFIER
 
