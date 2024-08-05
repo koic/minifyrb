@@ -92,10 +92,9 @@ module Minifyrb
           # NOTE: Prevent syntax errors by converting `cond? ? x : y` to `cond??x:y`.
           minified_values << if prev_token.value.end_with?('?')
             "#{token.value} "
-          elsif NUMERIC_LITERAL_TYPES.include?(next_token.type)
-            " #{token.value} "
           else
-            token.value
+            # NOTE: Require both spaces to prevent syntax error of `foo==bar?x:y`.
+            " #{token.value} "
           end
         when :COLON
           # NOTE: Prevent syntax errors by converting `cond(arg) ? x : y` to `cond(arg)?x:y`.

@@ -429,7 +429,7 @@ RSpec.describe Minifyrb::Minifier do
 
       it 'contain a space after the semicolon' do
         expect(minified_ruby).to eq <<~RUBY
-          cond?x: y
+          cond ? x: y
         RUBY
       end
     end
@@ -459,7 +459,7 @@ RSpec.describe Minifyrb::Minifier do
       # NOTE: Prevent syntax error of `cond(arg)?x:y`.
       it 'contain a space after the semicolon' do
         expect(minified_ruby).to eq <<~RUBY
-          cond(arg)?x: y
+          cond(arg) ? x: y
         RUBY
       end
     end
@@ -520,6 +520,35 @@ RSpec.describe Minifyrb::Minifier do
       it 'contain a space after the semicolon' do
         expect(minified_ruby).to eq <<~RUBY
           cond ? 4.2r: y
+        RUBY
+      end
+    end
+
+    context 'when using comparison operator in the condition of ternary oprator' do
+      let(:source) do
+        <<~RUBY
+          foo == bar ? x : y
+        RUBY
+      end
+
+      # NOTE: Prevent syntax error of `foo==bar?x:y`.
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo==bar ? x: y
+        RUBY
+      end
+    end
+
+    context 'when using comparison operator and RHS is a predicate method in the condition of ternary oprator' do
+      let(:source) do
+        <<~RUBY
+          foo == bar? ? x : y
+        RUBY
+      end
+
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo==bar?? x: y
         RUBY
       end
     end
