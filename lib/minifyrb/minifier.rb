@@ -83,7 +83,13 @@ module Minifyrb
           heredoc_content_tokens.clear
           in_heredoc = false
         when :NEWLINE
-          minified_values << (next_token.type == :EOF ? token.value : ';')
+          minified_values << if next_token.type == :EOF
+            token.value
+          elsif next_token.type == :PARENTHESIS_RIGHT
+            # noop
+          else
+            ';'
+          end
         else
           minified_values << token.value
         end

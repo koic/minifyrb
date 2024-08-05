@@ -94,6 +94,22 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using line break method call parenthesis' do
+      let(:source) do
+        <<~RUBY
+          foo(
+            arg
+          )
+        RUBY
+      end
+
+      it 'does not contain a semicolon before right-parenthesis' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo(arg)
+        RUBY
+      end
+    end
+
     context 'when using local variable without method call parenthesis' do
       let(:source) do
         <<~RUBY
