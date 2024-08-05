@@ -200,6 +200,76 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when `self` as a first argument' do
+      let(:source) do
+        <<~RUBY
+          foo self
+        RUBY
+      end
+
+      it 'leaves a space' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo self
+        RUBY
+      end
+    end
+
+    context 'when integer literal as a first argument' do
+      let(:source) do
+        <<~RUBY
+          foo 42
+        RUBY
+      end
+
+      it 'leaves a space' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo 42
+        RUBY
+      end
+    end
+
+    context 'when float literal as a first argument' do
+      let(:source) do
+        <<~RUBY
+          foo 4.2
+        RUBY
+      end
+
+      it 'leaves a space' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo 4.2
+        RUBY
+      end
+    end
+
+    context 'when integer rational literal as a first argument' do
+      let(:source) do
+        <<~RUBY
+          foo 42r
+        RUBY
+      end
+
+      it 'leaves a space' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo 42r
+        RUBY
+      end
+    end
+
+    context 'when float rational literal as a first argument' do
+      let(:source) do
+        <<~RUBY
+          foo 4.2r
+        RUBY
+      end
+
+      it 'leaves a space' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo 4.2r
+        RUBY
+      end
+    end
+
     context 'when using one-liner `do` `end` block call' do
       let(:source) do
         <<~RUBY

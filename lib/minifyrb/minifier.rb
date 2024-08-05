@@ -18,6 +18,7 @@ module Minifyrb
     NO_DELIMITER_VALUE_TYPES = %i(
       CONSTANT FLOAT IDENTIFIER INTEGER INTEGER_RATIONAL
     )
+    REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES = %i(FLOAT FLOAT_RATIONAL INTEGER INTEGER_RATIONAL KEYWORD_SELF)
 
     def initialize(source)
       result = Prism.lex(source)
@@ -37,6 +38,12 @@ module Minifyrb
         when :COMMENT
           if prev_token && prev_token.location.start_line == token.location.start_line && token.location.start_line < next_token.location.start_line
             minified_values << "\n"
+          end
+        when :IDENTIFIER
+          minified_values << token.value
+
+          if REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES.include?(next_token.type)
+            minified_values << ' '
           end
         when :IGNORED_NEWLINE, :EMBDOC_BEGIN, :EMBDOC_LINE, :EMBDOC_END
           # noop
