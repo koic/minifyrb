@@ -1159,6 +1159,20 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using `alias` and the second argument is a bang method' do
+      let(:source) do
+        <<~RUBY
+          alias new old!
+        RUBY
+      end
+
+      it 'contains space before the second argument' do
+        expect(minified_ruby).to eq <<~RUBY
+          alias new old!
+        RUBY
+      end
+    end
+
     context 'when using `undef`' do
       let(:source) do
         <<~RUBY
