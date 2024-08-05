@@ -350,7 +350,36 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
-    context 'when using ternary oprator' do
+    context 'when using the question of a ternary oprator after a non-predicate condition' do
+      let(:source) do
+        <<~RUBY
+          cond ? x : y
+        RUBY
+      end
+
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          cond?x: y
+        RUBY
+      end
+    end
+
+    context 'when using the question of a ternary oprator after a predicate condition' do
+      let(:source) do
+        <<~RUBY
+          cond? ? x : y
+        RUBY
+      end
+
+      # NOTE: Prevent syntax error of `cond?x:y`.
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          cond?? x: y
+        RUBY
+      end
+    end
+
+    context 'when using the colon of a ternary oprator' do
       let(:source) do
         <<~RUBY
           cond(arg) ? x : y

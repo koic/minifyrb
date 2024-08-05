@@ -82,6 +82,9 @@ module Minifyrb
 
           heredoc_content_tokens.clear
           in_heredoc = false
+        when :QUESTION_MARK
+          # NOTE: Prevent syntax errors by converting `cond? ? x : y` to `cond??x:y`.
+          minified_values << (prev_token.value.end_with?('?') ? "#{token.value} " : token.value)
         when :COLON
           # NOTE: Prevent syntax errors by converting `cond(arg) ? x : y` to `cond(arg)?x:y`.
           minified_values << "#{token.value} "
