@@ -49,6 +49,25 @@ Usage: minifyrb [options] [file1, file2, ...]
     -o, --output <file>              Output file (default STDOUT).
 ```
 
+### Rake Task
+
+You can define a Rake task for Minify. Please write the following code in your Rakefile:
+
+```ruby
+# Rakefile
+require 'minifyrb/rake_task'
+Minifyrb::RakeTask.new
+```
+
+The task `rake minifyrb` will be defined:
+
+```console
+$ bundle exec rake -T
+rake minifyrb                 # Minify Ruby files in the current directory and subdirectories
+```
+
+### Ruby API
+
 From Ruby code, use `Minifyrb::Minifier#minify` API:
 
 ```ruby
