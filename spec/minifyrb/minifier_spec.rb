@@ -464,6 +464,66 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using integer literal after the question of ternary oprator' do
+      let(:source) do
+        <<~RUBY
+          cond ? 42 : y
+        RUBY
+      end
+
+      # NOTE: Prevent syntax error of `cond?42: y`.
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          cond ? 42: y
+        RUBY
+      end
+    end
+
+    context 'when using float literal after the question of ternary oprator' do
+      let(:source) do
+        <<~RUBY
+          cond ? 4.2 : y
+        RUBY
+      end
+
+      # NOTE: Prevent syntax error of `cond?4.2: y`.
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          cond ? 4.2: y
+        RUBY
+      end
+    end
+
+    context 'when using integer rational literal after the question of ternary oprator' do
+      let(:source) do
+        <<~RUBY
+          cond ? 42r : y
+        RUBY
+      end
+
+      # NOTE: Prevent syntax error of `cond?42r: y`.
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          cond ? 42r: y
+        RUBY
+      end
+    end
+
+    context 'when using float rational literal after the question of ternary oprator' do
+      let(:source) do
+        <<~RUBY
+          cond ? 4.2r : y
+        RUBY
+      end
+
+      # NOTE: Prevent syntax error of `cond?4.2r: y`.
+      it 'contain a space after the semicolon' do
+        expect(minified_ruby).to eq <<~RUBY
+          cond ? 4.2r: y
+        RUBY
+      end
+    end
+
     context 'when using `while` expression' do
       let(:source) do
         <<~RUBY

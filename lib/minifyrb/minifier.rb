@@ -90,7 +90,13 @@ module Minifyrb
           in_heredoc = false
         when :QUESTION_MARK
           # NOTE: Prevent syntax errors by converting `cond? ? x : y` to `cond??x:y`.
-          minified_values << (prev_token.value.end_with?('?') ? "#{token.value} " : token.value)
+          minified_values << if prev_token.value.end_with?('?')
+            "#{token.value} "
+          elsif NUMERIC_LITERAL_TYPES.include?(next_token.type)
+            " #{token.value} "
+          else
+            token.value
+          end
         when :COLON
           # NOTE: Prevent syntax errors by converting `cond(arg) ? x : y` to `cond(arg)?x:y`.
           minified_values << "#{token.value} "
