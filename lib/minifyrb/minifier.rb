@@ -109,8 +109,8 @@ module Minifyrb
           minified_values << token.value
 
           minified_values << ' ' if next_token.type == :SYMBOL_BEGIN
-        when :EQUAL_EQUAL
-          minified_values << (prev_token.value.end_with?('?') ? " #{token.value}" : token.value)
+        when :EQUAL_EQUAL, :EQUAL_EQUAL_EQUAL, :EQUAL_GREATER
+          minified_values << (prev_token.value.end_with?('<', '=', '>', '?') ? " #{token.value}" : token.value)
         when :KEYWORD_DEF
           minified_values << ' ' if prev_token&.type == :IDENTIFIER
 

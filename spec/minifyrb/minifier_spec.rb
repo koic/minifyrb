@@ -154,6 +154,104 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when comparing with `==` and LHS is `:==`' do
+      let(:source) do
+        <<~RUBY
+          :== == :!=
+        RUBY
+      end
+
+      it 'leaves a space before hash rocket' do
+        expect(minified_ruby).to eq <<~RUBY
+          :== ==:!=
+        RUBY
+      end
+    end
+
+    context 'when comparing with `==` and LHS is `:!=`' do
+      let(:source) do
+        <<~RUBY
+          :!= == :!=
+        RUBY
+      end
+
+      it 'leaves a space before hash rocket' do
+        expect(minified_ruby).to eq <<~RUBY
+          :!= ==:!=
+        RUBY
+      end
+    end
+
+    context 'when comparing with `===` and LHS is `:==`' do
+      let(:source) do
+        <<~RUBY
+          :== === :!=
+        RUBY
+      end
+
+      it 'leaves a space before hash rocket' do
+        expect(minified_ruby).to eq <<~RUBY
+          :== ===:!=
+        RUBY
+      end
+    end
+
+    context 'when comparing with `===` and LHS is `:!=`' do
+      let(:source) do
+        <<~RUBY
+          :!= === :!=
+        RUBY
+      end
+
+      it 'leaves a space before hash rocket' do
+        expect(minified_ruby).to eq <<~RUBY
+          :!= ===:!=
+        RUBY
+      end
+    end
+
+    context 'when using hash rocket and key is `:==`' do
+      let(:source) do
+        <<~RUBY
+          {:== => :!=}
+        RUBY
+      end
+
+      it 'leaves a space before hash rocket' do
+        expect(minified_ruby).to eq <<~RUBY
+          {:== =>:!=}
+        RUBY
+      end
+    end
+
+    context 'when using hash rocket and key is `:>`' do
+      let(:source) do
+        <<~RUBY
+          {:> => :<=}
+        RUBY
+      end
+
+      it 'leaves a space before hash rocket' do
+        expect(minified_ruby).to eq <<~RUBY
+          {:> =>:<=}
+        RUBY
+      end
+    end
+
+    context 'when using hash rocket and key is `:<`' do
+      let(:source) do
+        <<~RUBY
+          {:< => :>=}
+        RUBY
+      end
+
+      it 'leaves a space before hash rocket' do
+        expect(minified_ruby).to eq <<~RUBY
+          {:< =>:>=}
+        RUBY
+      end
+    end
+
     context 'when using multiline hash literal' do
       let(:source) do
         <<~RUBY
