@@ -1000,6 +1000,21 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when defining private class method' do
+      let(:source) do
+        <<~RUBY
+          private_class_method def self.foo
+          end
+        RUBY
+      end
+
+      it 'contains spaces' do
+        expect(minified_ruby).to eq <<~RUBY
+          private_class_method def self.foo;end
+        RUBY
+      end
+    end
+
     context 'when defining class' do
       let(:source) do
         <<~RUBY
