@@ -109,6 +109,8 @@ module Minifyrb
           end
         else
           minified_values << token.value
+
+          minified_values << ' ' if prev_token&.type == :KEYWORD_ALIAS
         end
 
         if padding_required?(token, next_token)

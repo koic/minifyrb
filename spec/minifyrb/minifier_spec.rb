@@ -1086,6 +1086,34 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using `alias` and the first argument is comparison operator' do
+      let(:source) do
+        <<~RUBY
+          alias == eql?
+        RUBY
+      end
+
+      it 'contains spaces' do
+        expect(minified_ruby).to eq <<~RUBY
+          alias == eql?
+        RUBY
+      end
+    end
+
+    context 'when using `alias` and the second argument is comparison operator' do
+      let(:source) do
+        <<~RUBY
+          alias eql? ==
+        RUBY
+      end
+
+      it 'contains spaces' do
+        expect(minified_ruby).to eq <<~RUBY
+          alias eql? ==
+        RUBY
+      end
+    end
+
     context 'when using `undef`' do
       let(:source) do
         <<~RUBY
