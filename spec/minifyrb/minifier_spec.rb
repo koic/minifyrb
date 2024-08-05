@@ -110,6 +110,22 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using multiline array literal' do
+      let(:source) do
+        <<~RUBY
+          [
+            42
+          ]
+        RUBY
+      end
+
+      it 'does not contain a semicolon before closing braces' do
+        expect(minified_ruby).to eq <<~RUBY
+          [42]
+        RUBY
+      end
+    end
+
     context 'when using multiline hash literal' do
       let(:source) do
         <<~RUBY

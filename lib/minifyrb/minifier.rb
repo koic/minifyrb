@@ -112,7 +112,7 @@ module Minifyrb
         when :NEWLINE
           minified_values << if next_token.type == :EOF
             token.value
-          elsif next_token.type == :PARENTHESIS_RIGHT || next_token.type == :BRACE_RIGHT
+          elsif next_token.type == :PARENTHESIS_RIGHT || next_token.type == :BRACKET_RIGHT || next_token.type == :BRACE_RIGHT
             # noop
           else
             ';'
