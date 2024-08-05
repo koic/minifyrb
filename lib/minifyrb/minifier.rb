@@ -123,7 +123,7 @@ module Minifyrb
           minified_values << token.value
         end
 
-        if padding_required?(prev_token, token, next_token)
+        if padding_required?(token, next_token)
           minified_values << ' ' # Prevents syntax errros.
         end
 
@@ -135,10 +135,9 @@ module Minifyrb
 
     private
 
-    def padding_required?(prev_token, token, next_token)
+    def padding_required?(token, next_token)
       return true if token.type == :IDENTIFIER && (next_token.type == :IDENTIFIER || next_token.type == :CONSTANT)
-      return false if prev_token&.type == :SYMBOL_BEGIN || token.type == :SYMBOL_BEGIN
-      return false if next_token.type == :PARENTHESIS_LEFT
+      return false if token.type == :SYMBOL_BEGIN || next_token.type == :PARENTHESIS_LEFT
 
       AFTER_SPACE_REQUIRED_KEYWORDS.include?(token.type) || BEFORE_SPACE_REQUIRED_KEYWORDS.include?(next_token.type)
     end

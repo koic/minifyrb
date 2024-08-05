@@ -88,9 +88,9 @@ RSpec.describe Minifyrb::Minifier do
       end
 
       it 'leaves the symbol literal' do
-        expect(minified_ruby).to eq <<~RUBY
-          :and
-        RUBY
+        # NOTE: Ideally, whitespace after literals is unnecessary, but to prevent cases like `if :foo then; end`
+        # from being converted to `if :foothen; end`, whitespace is broadly allowed.
+        expect(minified_ruby).to eq ":and \n"
       end
     end
 
@@ -102,9 +102,9 @@ RSpec.describe Minifyrb::Minifier do
       end
 
       it 'leaves the symbol literal' do
-        expect(minified_ruby).to eq <<~RUBY
-          :or
-        RUBY
+        # NOTE: Ideally, whitespace after literals is unnecessary, but to prevent cases like `if :foo then; end`
+        # from being converted to `if :foothen; end`, whitespace is broadly allowed.
+        expect(minified_ruby).to eq ":or \n"
       end
     end
 
@@ -396,6 +396,21 @@ RSpec.describe Minifyrb::Minifier do
       it 'contain a space around the keyword' do
         expect(minified_ruby).to eq <<~RUBY
           if cond then foo;end
+        RUBY
+      end
+    end
+
+    context 'when using `if`..`then` expression and condition is a symbol literal' do
+      let(:source) do
+        <<~RUBY
+          if :cond then foo
+          end
+        RUBY
+      end
+
+      it 'contain a space around the keyword' do
+        expect(minified_ruby).to eq <<~RUBY
+          if :cond then foo;end
         RUBY
       end
     end
