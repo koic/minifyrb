@@ -80,6 +80,34 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when symbol literal `:and`' do
+      let(:source) do
+        <<~RUBY
+          :and
+        RUBY
+      end
+
+      it 'leaves the symbol literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          :and
+        RUBY
+      end
+    end
+
+    context 'when symbol literal `:or`' do
+      let(:source) do
+        <<~RUBY
+          :or
+        RUBY
+      end
+
+      it 'leaves the symbol literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          :or
+        RUBY
+      end
+    end
+
     context 'when calling method with around spaces' do
       let(:source) do
         <<~RUBY
