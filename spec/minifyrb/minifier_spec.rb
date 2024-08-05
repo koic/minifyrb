@@ -837,7 +837,7 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
-    context 'when using one-liner `begin` with rational' do
+    context 'when using one-liner `begin` with integer rational' do
       let(:source) do
         <<~RUBY
           begin 42r end
@@ -847,6 +847,20 @@ RSpec.describe Minifyrb::Minifier do
       it 'contain a space after the keyword' do
         expect(minified_ruby).to eq <<~RUBY
           begin 42r end
+        RUBY
+      end
+    end
+
+    context 'when using one-liner `begin` with float rational' do
+      let(:source) do
+        <<~RUBY
+          begin 4.2r end
+        RUBY
+      end
+
+      it 'contain a space after the keyword' do
+        expect(minified_ruby).to eq <<~RUBY
+          begin 4.2r end
         RUBY
       end
     end
