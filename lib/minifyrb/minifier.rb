@@ -111,6 +111,10 @@ module Minifyrb
           minified_values << ' ' if next_token.type == :SYMBOL_BEGIN
         when :EQUAL_EQUAL, :EQUAL_EQUAL_EQUAL, :EQUAL_GREATER
           minified_values << (prev_token.value.end_with?('<', '=', '>', '?') ? " #{token.value}" : token.value)
+        when :STRING_BEGIN, :REGEXP_BEGIN, :PERCENT_LOWER_X, :PERCENT_LOWER_W, :PERCENT_LOWER_I, :PERCENT_UPPER_W, :PERCENT_UPPER_I
+          minified_values << ' ' if token.value.start_with?('%')
+
+          minified_values << token.value
         when :KEYWORD_DEF
           minified_values << ' ' if prev_token&.type == :IDENTIFIER
 

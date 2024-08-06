@@ -1356,6 +1356,132 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using a percent literal as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %(a for b)
+        RUBY
+      end
+    end
+
+    context 'when using a percent string literal `%q` as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %q(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %q(a for b)
+        RUBY
+      end
+    end
+
+    context 'when using a percent string literal `%Q` as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %Q(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %Q(a for b)
+        RUBY
+      end
+    end
+
+    context 'when using a percent command literal `%x` as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %x(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %x(a for b)
+        RUBY
+      end
+    end
+
+    context 'when using a percent word array literal `%w` as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %w(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %w(a for b)
+        RUBY
+      end
+    end
+
+    context 'when using a percent word array literal `%W` as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %W(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %W(a for b)
+        RUBY
+      end
+    end
+
+    context 'when using a percent symbol array literal `%i` as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %i(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %i(a for b)
+        RUBY
+      end
+    end
+
+    context 'when using a percent symbol array literal `%I` as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %I(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %I(a for b)
+        RUBY
+      end
+    end
+
+    context 'when using a regexp literal as an argument' do
+      let(:source) do
+        <<~RUBY
+          foo %r(a for b)
+        RUBY
+      end
+
+      it 'leaves the space before the percent literal' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo %r(a for b)
+        RUBY
+      end
+    end
+
     context 'when using string literal' do
       let(:source) do
         '"  text  "'
