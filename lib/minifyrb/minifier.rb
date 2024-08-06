@@ -101,6 +101,10 @@ module Minifyrb
         when :COLON
           # NOTE: Prevent syntax errors by converting `cond(arg) ? x : y` to `cond(arg)?x:y`.
           @minified_values << "#{token.value} "
+        when :UCOLON_COLON
+          @minified_values << ' ' if prev_token.type == :IDENTIFIER || prev_token.type == :METHOD_NAME
+
+          append_token_to_minified_values(token)
         when :LABEL
           @minified_values << ' ' if prev_token.type == :IDENTIFIER
 

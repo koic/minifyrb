@@ -304,9 +304,37 @@ RSpec.describe Minifyrb::Minifier do
         RUBY
       end
 
-      it 'contain a space after method call' do
+      it 'leaves a space after method name' do
         expect(minified_ruby).to eq <<~RUBY
           include Foo
+        RUBY
+      end
+    end
+
+    context 'when calling method with cbase constant argument' do
+      let(:source) do
+        <<~RUBY
+          include ::Foo
+        RUBY
+      end
+
+      it 'leaves a space after method name' do
+        expect(minified_ruby).to eq <<~RUBY
+          include ::Foo
+        RUBY
+      end
+    end
+
+    context 'when calling predicate method with cbase constant argument' do
+      let(:source) do
+        <<~RUBY
+          foo? ::Foo
+        RUBY
+      end
+
+      it 'leaves a space after method name' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo? ::Foo
         RUBY
       end
     end
