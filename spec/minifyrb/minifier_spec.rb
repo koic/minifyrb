@@ -468,6 +468,48 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when true literal as a first argument' do
+      let(:source) do
+        <<~RUBY
+          foo true
+        RUBY
+      end
+
+      it 'leaves a space' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo true
+        RUBY
+      end
+    end
+
+    context 'when false literal as a first argument' do
+      let(:source) do
+        <<~RUBY
+          foo false
+        RUBY
+      end
+
+      it 'leaves a space' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo false
+        RUBY
+      end
+    end
+
+    context 'when nil literal as a first argument' do
+      let(:source) do
+        <<~RUBY
+          foo nil
+        RUBY
+      end
+
+      it 'leaves a space' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo nil
+        RUBY
+      end
+    end
+
     context 'when integer literal as a first argument' do
       let(:source) do
         <<~RUBY
