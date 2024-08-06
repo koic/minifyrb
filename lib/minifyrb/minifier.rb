@@ -114,7 +114,11 @@ module Minifyrb
         when :STRING_BEGIN, :REGEXP_BEGIN, :PERCENT_LOWER_X, :PERCENT_LOWER_W, :PERCENT_LOWER_I, :PERCENT_UPPER_W, :PERCENT_UPPER_I
           minified_values << ' ' if token.value.start_with?('%')
 
-          minified_values << token.value
+          if in_heredoc
+            heredoc_content_tokens << token
+          else
+            minified_values << token.value
+          end
         when :KEYWORD_DEF
           minified_values << ' ' if prev_token&.type == :IDENTIFIER
 
