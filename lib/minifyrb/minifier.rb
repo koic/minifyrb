@@ -24,39 +24,37 @@ module Minifyrb
       raise SyntaxError unless result.errors.empty?
 
       @tokens = result.value
+
+      @in_heredoc = false
+      @minified_values = []
+      @heredoc_content_tokens = []
     end
 
     def minify
-      minified_values = []
-      heredoc_content_tokens = []
-      squiggly_heredoc, in_heredoc = false
+      squiggly_heredoc = false
       prev_token, string_quote = nil
 
       @tokens.each_cons(2) do |(token, _lex_state), (next_token, _next_lex_state)|
         case token.type
         when :COMMENT
           if prev_token && prev_token.location.start_line == token.location.start_line && token.location.start_line < next_token.location.start_line
-            minified_values << "\n"
+            @minified_values << "\n"
           end
         when :IDENTIFIER
-          if in_heredoc
-            heredoc_content_tokens << token
-          else
-            minified_values << token.value
+          append_token_to_minified_values(token)
 
-            if REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES.include?(next_token.type)
-              minified_values << ' '
-            end
+          if REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES.include?(next_token.type)
+            @minified_values << ' '
           end
         when :IGNORED_NEWLINE, :EMBDOC_BEGIN, :EMBDOC_LINE, :EMBDOC_END
           # noop
         when :KEYWORD_END
           if NO_DELIMITER_VALUE_TYPES.include?(prev_token.type) && prev_token.location.start_line == token.location.start_line
-            minified_values << ' '
+            @minified_values << ' '
           end
-          minified_values << token.value
+          append_token_to_minified_values(token)
         when :HEREDOC_START
-          in_heredoc = true
+          @in_heredoc = true
           squiggly_heredoc = token.value.start_with?('<<~')
           string_quote = if token.value.end_with?("'")
             "'"
@@ -66,9 +64,9 @@ module Minifyrb
             '"'
           end
 
-          minified_values << string_quote
+          @minified_values << string_quote
         when :HEREDOC_END
-          heredoc_contents = heredoc_content_tokens.map { |token|
+          heredoc_contents = @heredoc_content_tokens.map { |token|
             if token.type == :STRING_CONTENT
               token.value.gsub(string_quote, "\\\\#{string_quote}") # Escape quotes.
             else
@@ -88,13 +86,13 @@ module Minifyrb
             heredoc_contents = lines.map { |line| line.delete_prefix(indentation) }
           end
 
-          minified_values << heredoc_contents << string_quote
+          @minified_values << heredoc_contents << string_quote
 
-          heredoc_content_tokens.clear
-          in_heredoc = false
+          @heredoc_content_tokens.clear
+          @in_heredoc = false
         when :QUESTION_MARK
           # NOTE: Prevent syntax errors by converting `cond? ? x : y` to `cond??x:y`.
-          minified_values << if prev_token.value.end_with?('?')
+          @minified_values << if prev_token.value.end_with?('?')
             "#{token.value} "
           else
             # NOTE: Require both spaces to prevent syntax error of `foo==bar?x:y`.
@@ -102,29 +100,25 @@ module Minifyrb
           end
         when :COLON
           # NOTE: Prevent syntax errors by converting `cond(arg) ? x : y` to `cond(arg)?x:y`.
-          minified_values << "#{token.value} "
+          @minified_values << "#{token.value} "
         when :LABEL
-          minified_values << ' ' if prev_token.type == :IDENTIFIER
+          @minified_values << ' ' if prev_token.type == :IDENTIFIER
 
-          minified_values << token.value
+          append_token_to_minified_values(token)
 
-          minified_values << ' ' if next_token.type == :SYMBOL_BEGIN
+          @minified_values << ' ' if next_token.type == :SYMBOL_BEGIN
         when :EQUAL, :EQUAL_EQUAL, :EQUAL_EQUAL_EQUAL, :EQUAL_GREATER
-          minified_values << (prev_token.value.end_with?('*', '<', '=', '>', '?') ? " #{token.value}" : token.value)
+          @minified_values << (prev_token.value.end_with?('*', '<', '=', '>', '?') ? " #{token.value}" : token.value)
         when :STRING_BEGIN, :REGEXP_BEGIN, :PERCENT_LOWER_X, :PERCENT_LOWER_W, :PERCENT_LOWER_I, :PERCENT_UPPER_W, :PERCENT_UPPER_I
-          minified_values << ' ' if token.value.start_with?('%')
+          @minified_values << ' ' if token.value.start_with?('%')
 
-          if in_heredoc
-            heredoc_content_tokens << token
-          else
-            minified_values << token.value
-          end
+          append_token_to_minified_values(token)
         when :KEYWORD_DEF
-          minified_values << ' ' if prev_token&.type == :IDENTIFIER
+          @minified_values << ' ' if prev_token&.type == :IDENTIFIER
 
-          minified_values << token.value
+          append_token_to_minified_values(token)
         when :NEWLINE
-          minified_values << if next_token.type == :EOF
+          @minified_values << if next_token.type == :EOF
             token.value
           elsif next_token.type == :PARENTHESIS_RIGHT || next_token.type == :BRACKET_RIGHT || next_token.type == :BRACE_RIGHT
             # noop
@@ -132,24 +126,28 @@ module Minifyrb
             ';'
           end
         else
-          if in_heredoc
-            heredoc_content_tokens << token
-          else
-            minified_values << token.value
-          end
+          append_token_to_minified_values(token)
         end
 
         if padding_required?(token, next_token)
-          minified_values << ' ' # Prevents syntax errros.
+          @minified_values << ' ' # Prevents syntax errros.
         end
 
         prev_token = token
       end
 
-      minified_values.join
+      @minified_values.join
     end
 
     private
+
+    def append_token_to_minified_values(token)
+      if @in_heredoc
+        @heredoc_content_tokens << token
+      else
+        @minified_values << token.value
+      end
+    end
 
     def padding_required?(token, next_token)
       return true if token.type == :IDENTIFIER && (next_token.type == :IDENTIFIER || next_token.type == :CONSTANT)

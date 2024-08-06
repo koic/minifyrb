@@ -1685,6 +1685,23 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when squiggly heredoc `<<~HEREDOC` has hash literal in interpolation' do
+      let(:source) do
+        <<~'RUBY'
+          <<~HEREDOC
+            #{{k: v}}
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~'RUBY'
+          "#{{k:v}}
+          "
+        RUBY
+      end
+    end
+
     context 'when using squiggly single-line heredoc `<<~HEREDOC`' do
       let(:source) do
         <<~RUBY
