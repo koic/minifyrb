@@ -105,6 +105,10 @@ module Minifyrb
           @minified_values << ' ' if prev_token.type == :IDENTIFIER || prev_token.type == :METHOD_NAME
 
           append_token_to_minified_values(token)
+        when :BANG_TILDE
+          @minified_values << ' ' if prev_token.type == :IDENTIFIER
+
+          append_token_to_minified_values(token)
         when :LABEL
           @minified_values << ' ' if prev_token.type == :IDENTIFIER
 

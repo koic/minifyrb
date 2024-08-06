@@ -138,6 +138,34 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using bang tilde after method call' do
+      let(:source) do
+        <<~RUBY
+          foo !~ bar
+        RUBY
+      end
+
+      it 'leaves a space before bang tilde' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo !~bar
+        RUBY
+      end
+    end
+
+    context 'when using bang tilde after predicate method call' do
+      let(:source) do
+        <<~RUBY
+          foo? !~ bar
+        RUBY
+      end
+
+      it 'leaves a space before bang tilde' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo?!~bar
+        RUBY
+      end
+    end
+
     context 'when using nameless splat-assignment' do
       let(:source) do
         <<~RUBY
