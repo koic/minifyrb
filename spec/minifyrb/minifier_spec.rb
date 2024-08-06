@@ -31,6 +31,21 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using comment at the end of the line' do
+      let(:source) do
+        <<~RUBY
+          42
+          # comment
+        RUBY
+      end
+
+      it 'convert to newline' do
+        expect(minified_ruby).to eq <<~RUBY
+          42;
+        RUBY
+      end
+    end
+
     context 'when using multi-line comments' do
       let(:source) do
         <<~RUBY

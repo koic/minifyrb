@@ -38,7 +38,7 @@ module Minifyrb
       @tokens.each_cons(2) do |(token, _lex_state), (next_token, _next_lex_state)|
         case token.type
         when :COMMENT
-          if prev_token && prev_token.location.start_line == token.location.start_line && token.location.start_line < next_token.location.start_line
+          if prev_token && prev_token.location.start_line == token.location.start_line && token.location.start_line < next_token.location.start_line || next_token.type == :EOF
             append_token_value_to_minified_values("\n")
           end
         when :IDENTIFIER
