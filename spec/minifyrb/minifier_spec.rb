@@ -46,6 +46,21 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when a trailing comment is used and there is an expression after it' do
+      let(:source) do
+        <<~RUBY
+          foo # comment
+          bar
+        RUBY
+      end
+
+      it 'does not contain comments' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo;bar
+        RUBY
+      end
+    end
+
     context 'when using multi-line comments' do
       let(:source) do
         <<~RUBY
@@ -207,6 +222,24 @@ RSpec.describe Minifyrb::Minifier do
       it 'does not contain a semicolon before closing braces' do
         expect(minified_ruby).to eq <<~RUBY
           [42]
+        RUBY
+      end
+    end
+
+    context 'when a trailing comment is used after the first element of multiline array' do
+      let(:source) do
+        <<~RUBY
+          [
+            foo, # comment
+            bar
+          ]
+        RUBY
+      end
+
+      it 'convert to newline' do
+        expect(minified_ruby).to eq <<~RUBY
+          [foo,
+          bar]
         RUBY
       end
     end
