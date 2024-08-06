@@ -1572,6 +1572,21 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using multiline percent array literal `%w`' do
+      let(:source) do
+        <<~RUBY
+          %w(
+            foo
+            bar
+          )
+        RUBY
+      end
+
+      it 'converts to one-line percent literal' do
+        expect(minified_ruby).to eq " %w(foo bar)\n"
+      end
+    end
+
     context 'when using a percent word array literal `%w` as an argument' do
       let(:source) do
         <<~RUBY
@@ -1583,6 +1598,21 @@ RSpec.describe Minifyrb::Minifier do
         expect(minified_ruby).to eq <<~RUBY
           foo %w(a for b)
         RUBY
+      end
+    end
+
+    context 'when using multiline percent array literal `%W`' do
+      let(:source) do
+        <<~RUBY
+          %W(
+            foo
+            bar
+          )
+        RUBY
+      end
+
+      it 'converts to one-line percent literal' do
+        expect(minified_ruby).to eq " %W(foo bar)\n"
       end
     end
 
@@ -1600,6 +1630,21 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using multiline percent symbol literal `%i`' do
+      let(:source) do
+        <<~RUBY
+          %i(
+            foo
+            bar
+          )
+        RUBY
+      end
+
+      it 'converts to one-line percent literal' do
+        expect(minified_ruby).to eq " %i(foo bar)\n"
+      end
+    end
+
     context 'when using a percent symbol array literal `%i` as an argument' do
       let(:source) do
         <<~RUBY
@@ -1611,6 +1656,21 @@ RSpec.describe Minifyrb::Minifier do
         expect(minified_ruby).to eq <<~RUBY
           foo %i(a for b)
         RUBY
+      end
+    end
+
+    context 'when using multiline percent symbol literal `%I`' do
+      let(:source) do
+        <<~RUBY
+          %I(
+            foo
+            bar
+          )
+        RUBY
+      end
+
+      it 'converts to one-line percent literal' do
+        expect(minified_ruby).to eq " %I(foo bar)\n"
       end
     end
 

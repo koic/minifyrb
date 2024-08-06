@@ -16,6 +16,7 @@ module Minifyrb
       KEYWORD_UNLESS_MODIFIER KEYWORD_UNTIL_MODIFIER KEYWORD_WHILE_MODIFIER
     )
     NUMERIC_LITERAL_TYPES = %i(FLOAT FLOAT_RATIONAL INTEGER INTEGER_RATIONAL)
+    PERCENT_ARRAY_LITERAL_TYPES = %i(PERCENT_LOWER_W PERCENT_UPPER_W PERCENT_LOWER_I PERCENT_UPPER_I)
     NO_DELIMITER_VALUE_TYPES = %i(CONSTANT IDENTIFIER) + NUMERIC_LITERAL_TYPES
     REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES = %i(KEYWORD_SELF KEYWORD_TRUE KEYWORD_FALSE KEYWORD_NIL METHOD_NAME) + NUMERIC_LITERAL_TYPES
 
@@ -119,7 +120,7 @@ module Minifyrb
           token_value = (prev_token.value.end_with?('*', '<', '=', '>', '?') ? " #{token.value}" : token.value)
 
           append_token_value_to_minified_values(token_value)
-        when :STRING_BEGIN, :REGEXP_BEGIN, :PERCENT_LOWER_X, :PERCENT_LOWER_W, :PERCENT_LOWER_I, :PERCENT_UPPER_W, :PERCENT_UPPER_I
+        when :STRING_BEGIN, :REGEXP_BEGIN, :PERCENT_LOWER_X, *PERCENT_ARRAY_LITERAL_TYPES
           append_token_value_to_minified_values(' ') if token.value.start_with?('%')
 
           append_token_to_minified_values(token)
@@ -127,6 +128,10 @@ module Minifyrb
           append_token_value_to_minified_values(' ') if prev_token&.type == :IDENTIFIER
 
           append_token_to_minified_values(token)
+        when :WORDS_SEP
+          if !PERCENT_ARRAY_LITERAL_TYPES.include?(prev_token.type) && next_token.type != :STRING_END
+            append_token_value_to_minified_values(' ')
+          end
         when :NEWLINE
           token_value = if next_token.type == :EOF
             token.value
