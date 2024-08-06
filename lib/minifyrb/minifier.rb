@@ -19,9 +19,9 @@ module Minifyrb
     NO_DELIMITER_VALUE_TYPES = %i(CONSTANT IDENTIFIER) + NUMERIC_LITERAL_TYPES
     REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES = %i(KEYWORD_SELF METHOD_NAME) + NUMERIC_LITERAL_TYPES
 
-    def initialize(source)
+    def initialize(source, filepath: nil)
       result = Prism.lex(source)
-      raise SyntaxError unless result.errors.empty?
+      raise SyntaxError, filepath || 'compile error' unless result.errors.empty?
 
       @tokens = result.value
 

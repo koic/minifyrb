@@ -30,7 +30,7 @@ module Minifyrb
       puts 'Running Minify Ruby...' if verbose
       Dir['**/*.rb'].each { |ruby_filepath|
         code = File.read(ruby_filepath)
-        minified_code = Minifyrb::Minifier.new(code).minify
+        minified_code = Minifyrb::Minifier.new(code, filepath: ruby_filepath).minify
 
         File.write(ruby_filepath, minified_code)
       }

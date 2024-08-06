@@ -31,17 +31,14 @@ if params[:version]
 end
 
 filepaths = ARGV
-sources = []
 
-if filepaths.empty?
-  sources = [$stdin.read]
+minified_rubies = if filepaths.empty?
+  Minifyrb::Minifier.new($stdin.read).minify
 else
-  filepaths.map do |filepath|
-    sources << File.read(filepath)
-  end
+  filepaths.map { |filepath|
+    Minifyrb::Minifier.new(File.read(filepath), filepath:).minify
+  }.join
 end
-
-minified_rubies = sources.map { |source| Minifyrb::Minifier.new(source).minify }.join
 
 if (filepath = params[:output])
   File.write(filepath, minified_rubies)
