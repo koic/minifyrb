@@ -26,37 +26,38 @@ module Minifyrb
       @tokens = result.value
 
       @in_heredoc = false
+      @string_quote = nil
       @minified_values = []
       @heredoc_content_tokens = []
     end
 
     def minify
       squiggly_heredoc = false
-      prev_token, string_quote = nil
+      prev_token = nil
 
       @tokens.each_cons(2) do |(token, _lex_state), (next_token, _next_lex_state)|
         case token.type
         when :COMMENT
           if prev_token && prev_token.location.start_line == token.location.start_line && token.location.start_line < next_token.location.start_line
-            @minified_values << "\n"
+            append_token_value_to_minified_values("\n")
           end
         when :IDENTIFIER
           append_token_to_minified_values(token)
 
           if REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES.include?(next_token.type)
-            @minified_values << ' '
+            append_token_value_to_minified_values(' ')
           end
         when :IGNORED_NEWLINE, :EMBDOC_BEGIN, :EMBDOC_LINE, :EMBDOC_END
           # noop
         when :KEYWORD_END
           if NO_DELIMITER_VALUE_TYPES.include?(prev_token.type) && prev_token.location.start_line == token.location.start_line
-            @minified_values << ' '
+            append_token_value_to_minified_values(' ')
           end
           append_token_to_minified_values(token)
         when :HEREDOC_START
           @in_heredoc = true
           squiggly_heredoc = token.value.start_with?('<<~')
-          string_quote = if token.value.end_with?("'")
+          @string_quote = if token.value.end_with?("'")
             "'"
           elsif token.value.end_with?('`')
             '`'
@@ -64,18 +65,12 @@ module Minifyrb
             '"'
           end
 
-          @minified_values << string_quote
+          @minified_values << (@string_quote == '`' ? '`' : '"')
         when :HEREDOC_END
-          heredoc_contents = @heredoc_content_tokens.map { |token|
-            if token.type == :STRING_CONTENT
-              token.value.gsub(string_quote, "\\\\#{string_quote}") # Escape quotes.
-            else
-              token.value
-            end
-          }
+          heredoc_contents = @heredoc_content_tokens.join
 
           if squiggly_heredoc
-            lines = heredoc_contents.join.lines
+            lines = heredoc_contents.lines
 
             minimum_indentation_length = lines.map { |line|
               line.match(/\A(?<indentation_spaces> *)/)[:indentation_spaces].length
@@ -86,59 +81,66 @@ module Minifyrb
             heredoc_contents = lines.map { |line| line.delete_prefix(indentation) }
           end
 
-          @minified_values << heredoc_contents << string_quote
+          @minified_values << heredoc_contents
+          @minified_values << (@string_quote == '`' ? '`' : '"')
 
           @heredoc_content_tokens.clear
           @in_heredoc = false
         when :QUESTION_MARK
           # NOTE: Prevent syntax errors by converting `cond? ? x : y` to `cond??x:y`.
-          @minified_values << if prev_token.value.end_with?('?')
+          token_value = if prev_token.value.end_with?('?')
             "#{token.value} "
           else
             # NOTE: Require both spaces to prevent syntax error of `foo==bar?x:y`.
             " #{token.value} "
           end
+
+          append_token_value_to_minified_values(token_value)
         when :COLON
           # NOTE: Prevent syntax errors by converting `cond(arg) ? x : y` to `cond(arg)?x:y`.
-          @minified_values << "#{token.value} "
+          append_token_value_to_minified_values("#{token.value} ")
         when :UCOLON_COLON
-          @minified_values << ' ' if prev_token.type == :IDENTIFIER || prev_token.type == :METHOD_NAME
+          append_token_value_to_minified_values(' ') if prev_token.type == :IDENTIFIER || prev_token.type == :METHOD_NAME
 
           append_token_to_minified_values(token)
         when :BANG_TILDE
-          @minified_values << ' ' if prev_token.type == :IDENTIFIER
+          append_token_value_to_minified_values(' ') if prev_token.type == :IDENTIFIER
 
           append_token_to_minified_values(token)
         when :LABEL
-          @minified_values << ' ' if prev_token.type == :IDENTIFIER
+          append_token_value_to_minified_values(' ') if prev_token.type == :IDENTIFIER
 
           append_token_to_minified_values(token)
 
-          @minified_values << ' ' if next_token.type == :SYMBOL_BEGIN
+          append_token_value_to_minified_values(' ') if next_token.type == :SYMBOL_BEGIN
         when :EQUAL, :EQUAL_EQUAL, :EQUAL_EQUAL_EQUAL, :EQUAL_GREATER
-          @minified_values << (prev_token.value.end_with?('*', '<', '=', '>', '?') ? " #{token.value}" : token.value)
+          token_value = (prev_token.value.end_with?('*', '<', '=', '>', '?') ? " #{token.value}" : token.value)
+
+          append_token_value_to_minified_values(token_value)
         when :STRING_BEGIN, :REGEXP_BEGIN, :PERCENT_LOWER_X, :PERCENT_LOWER_W, :PERCENT_LOWER_I, :PERCENT_UPPER_W, :PERCENT_UPPER_I
-          @minified_values << ' ' if token.value.start_with?('%')
+          append_token_value_to_minified_values(' ') if token.value.start_with?('%')
 
           append_token_to_minified_values(token)
         when :KEYWORD_DEF
-          @minified_values << ' ' if prev_token&.type == :IDENTIFIER
+          append_token_value_to_minified_values(' ') if prev_token&.type == :IDENTIFIER
 
           append_token_to_minified_values(token)
         when :NEWLINE
-          @minified_values << if next_token.type == :EOF
+          token_value = if next_token.type == :EOF
             token.value
           elsif next_token.type == :PARENTHESIS_RIGHT || next_token.type == :BRACKET_RIGHT || next_token.type == :BRACE_RIGHT
             # noop
           else
             ';'
           end
+
+          append_token_value_to_minified_values(token_value)
         else
           append_token_to_minified_values(token)
         end
 
         if padding_required?(token, next_token)
-          @minified_values << ' ' # Prevents syntax errros.
+          append_token_value_to_minified_values(' ')
         end
 
         prev_token = token
@@ -151,9 +153,25 @@ module Minifyrb
 
     def append_token_to_minified_values(token)
       if @in_heredoc
-        @heredoc_content_tokens << token
+        token_value = if token.type == :STRING_CONTENT
+          token.value.gsub!(/(?<!\\)"/, '\\\"') # Escape quotes.
+          if @in_heredoc && @string_quote == "'"
+            token.value.gsub!(/\#{/, '\\#{') # FIXME: Dirty Hack for escape of string interpolation
+          end
+        end
+        token_value ||= token.value
+
+        @heredoc_content_tokens << token_value
       else
         @minified_values << token.value
+      end
+    end
+
+    def append_token_value_to_minified_values(token_value)
+      if @in_heredoc
+        @heredoc_content_tokens << token_value
+      else
+        @minified_values << token_value
       end
     end
 

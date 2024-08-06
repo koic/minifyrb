@@ -1586,7 +1586,7 @@ RSpec.describe Minifyrb::Minifier do
       end
 
       it 'convert to compatible string' do
-        expect(minified_ruby).to eq %('  text\n'\n)
+        expect(minified_ruby).to eq %("  text\n"\n)
       end
     end
 
@@ -1637,6 +1637,25 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context "when using heredoc `<<'HEREDOC'` with interpolation" do
+      let(:source) do
+        <<~'RUBY'
+          <<'HEREDOC'
+            string #{interpolation} # comment
+            text # comment
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~'RUBY'
+          "  string \#{interpolation} # comment
+            text # comment
+          "
+        RUBY
+      end
+    end
+
     context 'when using heredoc `<<~HEREDOC` with interpolation' do
       let(:source) do
         <<~'RUBY'
@@ -1666,9 +1685,28 @@ RSpec.describe Minifyrb::Minifier do
       end
 
       it 'convert to compatible string' do
+        expect(minified_ruby).to eq <<~RUBY
+          "  'foo'
+          "
+        RUBY
+      end
+    end
+
+    context 'when using string that has backquoted single quotes' do
+      let(:source) do
+        <<~'RUBY'
+          <<~'HEREDOC'
+            '  \'foo\'
+            '
+          HEREDOC
+        RUBY
+      end
+
+      it 'convert to compatible string' do
         expect(minified_ruby).to eq <<~'RUBY'
-          '  \'foo\'
+          "'  \'foo\'
           '
+          "
         RUBY
       end
     end
@@ -1700,9 +1738,9 @@ RSpec.describe Minifyrb::Minifier do
       end
 
       it 'convert to compatible string' do
-        expect(minified_ruby).to eq <<~'RUBY'
-          '\'foo\'
-          '
+        expect(minified_ruby).to eq <<~RUBY
+          "'foo'
+          "
         RUBY
       end
     end
