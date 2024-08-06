@@ -138,6 +138,20 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using nameless splat-assignment' do
+      let(:source) do
+        <<~RUBY
+          * = array
+        RUBY
+      end
+
+      it 'leaves the space before slpat-assignment' do
+        expect(minified_ruby).to eq <<~RUBY
+          * =array
+        RUBY
+      end
+    end
+
     context 'when using multiline array literal' do
       let(:source) do
         <<~RUBY
