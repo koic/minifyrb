@@ -19,6 +19,7 @@ module Minifyrb
     PERCENT_ARRAY_LITERAL_TYPES = %i(PERCENT_LOWER_W PERCENT_UPPER_W PERCENT_LOWER_I PERCENT_UPPER_I)
     NO_DELIMITER_VALUE_TYPES = %i(CONSTANT IDENTIFIER) + NUMERIC_LITERAL_TYPES
     REQUIRE_SPACE_AFTER_IDENTIFIER_TYPES = %i(KEYWORD_SELF KEYWORD_TRUE KEYWORD_FALSE KEYWORD_NIL METHOD_NAME) + NUMERIC_LITERAL_TYPES
+    CLOSING_DELIMITER_TYPES = %i(PARENTHESIS_RIGHT BRACKET_RIGHT BRACE_RIGHT)
 
     def initialize(source, filepath: nil)
       result = Prism.lex(source)
@@ -52,6 +53,16 @@ module Minifyrb
           end
         when :IGNORED_NEWLINE, :EMBDOC_BEGIN, :EMBDOC_LINE, :EMBDOC_END
           # noop
+        when :NEWLINE
+          token_value = if next_token.type == :EOF
+            token.value
+          elsif CLOSING_DELIMITER_TYPES.include?(next_token.type)
+            # NOTE: This noop is required due to https://github.com/ruby/prism/issues/2967.
+          else
+            ';'
+          end
+
+          append_token_value_to_minified_values(token_value)
         when :KEYWORD_END
           if NO_DELIMITER_VALUE_TYPES.include?(prev_token.type) && prev_token.location.start_line == token.location.start_line
             append_token_value_to_minified_values(' ')
@@ -132,16 +143,6 @@ module Minifyrb
           if !PERCENT_ARRAY_LITERAL_TYPES.include?(prev_token.type) && next_token.type != :STRING_END
             append_token_value_to_minified_values(' ')
           end
-        when :NEWLINE
-          token_value = if next_token.type == :EOF
-            token.value
-          elsif next_token.type == :PARENTHESIS_RIGHT || next_token.type == :BRACKET_RIGHT || next_token.type == :BRACE_RIGHT
-            # noop
-          else
-            ';'
-          end
-
-          append_token_value_to_minified_values(token_value)
         else
           append_token_to_minified_values(token)
         end
