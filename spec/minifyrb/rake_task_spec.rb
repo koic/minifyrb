@@ -12,7 +12,7 @@ RSpec.describe Minifyrb::RakeTask do
   end
 
   describe 'defining tasks' do
-    it 'creates a rubocop task and a minifyrb task' do
+    it 'creates a minifyrb task' do
       described_class.new
 
       expect(Rake::Task).to be_task_defined(:minifyrb)
