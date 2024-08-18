@@ -2,7 +2,6 @@
 
 require 'rake'
 require 'rake/tasklib'
-require_relative 'minifier'
 
 # Provides a custom rake task.
 #
@@ -25,7 +24,7 @@ module Minifyrb
     private
 
     def run_minify_ruby(verbose)
-      require_relative '../minifyrb'
+      require_relative 'minifier'
 
       puts 'Running Minify Ruby...' if verbose
       Dir['**/*.rb'].each { |ruby_filepath|
