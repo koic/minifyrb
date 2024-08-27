@@ -1,5 +1,6 @@
 # Minify Ruby
 
+[![Gem Version](https://badge.fury.io/rb/minifyrb.svg)](https://badge.fury.io/rb/minifyrb)
 [![CI](https://github.com/koic/minifyrb/actions/workflows/test.yml/badge.svg)](https://github.com/koic/minifyrb/actions/workflows/test.yml)
 
 A minifier of Ruby files.
