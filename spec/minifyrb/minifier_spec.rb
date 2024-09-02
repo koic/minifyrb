@@ -415,6 +415,34 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when calling method with array literal argument' do
+      let(:source) do
+        <<~RUBY
+          foo [item]
+        RUBY
+      end
+
+      it 'leaves a space after method name' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo [item]
+        RUBY
+      end
+    end
+
+    context 'when calling method with index access' do
+      let(:source) do
+        <<~RUBY
+          foo[key]
+        RUBY
+      end
+
+      it 'leaves a space after method name' do
+        expect(minified_ruby).to eq <<~RUBY
+          foo[key]
+        RUBY
+      end
+    end
+
     context 'when calling method with keyword argument with symbol value' do
       let(:source) do
         <<~RUBY

@@ -135,7 +135,7 @@ module Minifyrb
           append_token_value_to_minified_values(' ') if token.value.start_with?('%')
 
           append_token_to_minified_values(token)
-        when :KEYWORD_DEF
+        when :BRACKET_LEFT_ARRAY, :KEYWORD_DEF
           append_token_value_to_minified_values(' ') if prev_token&.type == :IDENTIFIER
 
           append_token_to_minified_values(token)
