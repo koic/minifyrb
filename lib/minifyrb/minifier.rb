@@ -154,7 +154,9 @@ module Minifyrb
         prev_token = token
       end
 
-      @minified_values.join
+      minified_code = @minified_values.join
+
+      minified_code.match?(/\A\r?\n+\z/) ? '' : minified_code
     end
 
     private

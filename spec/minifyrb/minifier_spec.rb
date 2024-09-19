@@ -16,6 +16,31 @@ RSpec.describe Minifyrb::Minifier do
       end
     end
 
+    context 'when using single-line comment only' do
+      let(:source) do
+        <<~RUBY
+          # comment
+        RUBY
+      end
+
+      it 'does not contain comments and newline' do
+        expect(minified_ruby).to eq ''
+      end
+    end
+
+    context 'when using multiline line comment only' do
+      let(:source) do
+        <<~RUBY
+          # comment1
+          # comment2
+        RUBY
+      end
+
+      it 'does not contain comments and newline' do
+        expect(minified_ruby).to eq ''
+      end
+    end
+
     context 'when using single-line comments' do
       let(:source) do
         <<~RUBY
