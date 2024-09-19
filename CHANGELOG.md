@@ -2,6 +2,12 @@
 
 ## master (unreleased)
 
+## 0.1.2 (2024-09-20)
+
+### Bug fixes
+
+* Code consisting only of comments should be converted to an empty file. @koic
+
 ## 0.1.1 (2024-09-03)
 
 ### Bug fixes
