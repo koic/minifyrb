@@ -1,0 +1,3 @@
+module Minifyrb
+  VERSION: String
+end
