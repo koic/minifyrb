@@ -1,0 +1,5 @@
+module Minifyrb
+  class RakeTask
+    def initialize: (?(Symbol | String) name, *untyped) ?{ (*untyped, **untyped) -> untyped } -> void
+  end
+end

@@ -1,0 +1,7 @@
+module Minifyrb
+  class Minifier
+    def initialize: (String code, ?filepath: String?) -> void
+
+    def minify: () -> String
+  end
+end
